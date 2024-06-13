@@ -12,12 +12,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     })
 
-    // when the user types in a number 
+    // when the user types using their keyboard 
     document.addEventListener('keydown', function(event) {
         let numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+        let symbols = ["%", "/", "*", "-", "+"];
         let key = event.key;
 
-        if (key in numbers) {  // check that the user is typing a number
+        if (numbers.includes(key)) {  // when the user is typing a number
             if (secondNum === false) {
                 number(key, 1);
             }
@@ -25,21 +26,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 number(key, 2);
             }
         }
+        else if (symbols.includes(key)) {  // same as clicking the symbol buttons
+            operate(key);
+        }
+        else if (key === "Backspace") {  // does the same as AC
+            clear();
+        }
+        else if (key === "Enter") {  // does the same as =
+            if (num[1] !== "" && num[2] !== "") {  // checks that there are numbers to operate with
+                equals("equals");
+            }
+        }
     });
 
     // when the user clicks on an operation button
     document.querySelectorAll(".symbol").forEach(btn => {
         btn.onclick = function() {
-            if (num[1] !== "" && num[2] !== "") {  // checks that there are numbers to operate with
-                if (operation !== "") {  // completes the operation if user wants to operate for a second time
-                    equals("operation");
-                    operation = btn.dataset.val;
-                }
-            }
-            else {
-                operation = btn.dataset.val;
-                secondNum = true;
-            }
+            operate(btn);
         }
     })
 
@@ -50,17 +53,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // when the user clears the screen
-    document.querySelector("#bAC").onclick = function() {
-        digitCount[1] = 0;
-        digitCount[2] = 0;
-        periodCount[1] = 0;
-        periodCount[2] = 0;
-        num[1] = "";
-        num[2] = "";
-        secondNum = false;
-        screen.innerHTML = num[1];
-    }
+    // when the user clicks on AC, clears the screen
+    document.querySelector("#bAC").onclick = clear;
 
     // when the user changes number sign from positive to negative and viceversa
     document.querySelector("#bSign").onclick = function() {
@@ -83,6 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let periodCount = {1: 0, 2: 0};
     let num = {1: "", 2: ""};
 
+    // current operation being performed
     let operation = "";
 
     let screen = document.querySelector("#screen");
@@ -90,7 +85,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function number(btnOrKey, number) {
     let value;
-
     try {
         value = btnOrKey.dataset.num;
         console.log(`Adding btn ${value} to number ${number}`);
@@ -113,6 +107,29 @@ function number(btnOrKey, number) {
 }
 
 
+function operate(btnOrKey) {
+    let value;
+    try {
+        value = btnOrKey.dataset.val;
+    }
+    catch(err) {
+        value = btnOrKey;
+    }
+    console.log(`Calling operation with symbol ${value}`);
+
+    if (num[1] !== "" && num[2] !== "") {  // checks that there are numbers to operate with
+        if (operation !== "") {  // completes the operation if user wants to operate for a second time
+            equals("operation");
+            operation = value;
+        }
+    }
+    else {
+        operation = value;
+        secondNum = true;
+    }
+}
+
+
 function changeSigns(number) {
     console.log(`Changing signs for number ${number}`);
 
@@ -129,6 +146,7 @@ function changeSigns(number) {
 function equals(type) {  // type can be 'equals' for the equal sign and 'operation' for other symbols
     console.log(`Running equals function! ${num[1]} ${operation} ${num[2]}`);
 
+    // performs operations
     if (operation === "%") {
         num[1] = parseFloat(num[1]) % parseFloat(num[2]);
     }
@@ -166,4 +184,17 @@ function equals(type) {  // type can be 'equals' for the equal sign and 'operati
             screen.innerHTML = num[1];
         }
     }
+}
+
+
+// clears the screen and all the variables
+function clear() {
+    digitCount[1] = 0;
+    digitCount[2] = 0;
+    periodCount[1] = 0;
+    periodCount[2] = 0;
+    num[1] = "";
+    num[2] = "";
+    secondNum = false;
+    screen.innerHTML = num[1];
 }
