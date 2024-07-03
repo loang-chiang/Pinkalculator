@@ -197,4 +197,9 @@ function clear() {
     num[2] = "";
     secondNum = false;
     screen.innerHTML = num[1];
+
+    // set setup back to normal
+    setup = document.querySelector("#setup");
+    setup.style.height = "170px";
+    setup.removeChild(setup.lastChild);
 }
